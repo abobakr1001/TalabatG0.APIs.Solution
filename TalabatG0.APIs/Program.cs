@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using TalabatG0.APIs.Helpers;
 using TalabatG02.Core.Repositories;
 using TalabatG02.Repository;
 using TalabatG02.Repository.Data;
@@ -20,6 +21,8 @@ namespace TalabatG0.APIs
             });
 
             builder.Services.AddScoped(typeof(IGenericRepostory<>),typeof(GenericRepostory<>));
+
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
