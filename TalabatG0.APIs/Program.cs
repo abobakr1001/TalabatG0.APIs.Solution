@@ -57,6 +57,8 @@ namespace TalabatG0.APIs
 
             app.UseHttpsRedirection();
 
+            app.UseStaticFiles(); // files 
+
             app.UseAuthorization();
 
 
