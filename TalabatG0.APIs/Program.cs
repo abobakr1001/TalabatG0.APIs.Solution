@@ -1,5 +1,8 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TalabatG0.APIs.Errors;
 using TalabatG0.APIs.Helpers;
+using TalabatG0.APIs.Middlewars;
 using TalabatG02.Core.Repositories;
 using TalabatG02.Repository;
 using TalabatG02.Repository.Data;
@@ -23,6 +26,26 @@ namespace TalabatG0.APIs
             builder.Services.AddScoped(typeof(IGenericRepostory<>),typeof(GenericRepostory<>));
 
             builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+
+            #region Validation error
+                 builder.Services.Configure<ApiBehaviorOptions>(opteion =>
+                    {
+                        opteion.InvalidModelStateResponseFactory = (actionConext) =>
+                        {
+                            var errors= actionConext.ModelState.Where(p=>p.Value.Errors.Count()>0)
+                                                                    .SelectMany(p=>p.Value.Errors)
+                                                                    .Select(e=>e.ErrorMessage).ToArray();
+                            var validationError = new ApiValidationErrorResponse()
+                            {
+                                Errors = errors
+                            };
+                            return new BadRequestObjectResult(validationError);
+                        };
+                
+                    });
+            #endregion
+           
 
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -55,9 +78,11 @@ namespace TalabatG0.APIs
                 app.UseSwaggerUI();
             }
 
+            app.UseMiddleware<ExceptionMiddleware>();
             app.UseHttpsRedirection();
 
             app.UseStaticFiles(); // files 
+            app.UseStatusCodePagesWithRedirects("/errors/{0}");
 
             app.UseAuthorization();
 
